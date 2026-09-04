@@ -1,0 +1,28 @@
+# ROS 2 / colcon generated output
+build/
+install/
+log/
+
+# Python generated files
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Editor and OS files
+.vscode/
+.idea/
+*.swp
+*~
+.DS_Store
+
+# Local agent state
+.agents/
+.codex/
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
