@@ -17,7 +17,7 @@ Target architecture:
 Thermal Camera
       ↓
 Edge Computer
-(currently planned: Raspberry Pi 5)
+(selected: Raspberry Pi 4 Model B)
       ↓
 Image Acquisition
       ↓
@@ -55,7 +55,7 @@ The autonomous-side software should not depend on whether detections come from:
 
 as long as the ROS 2 interface contract remains compatible.
 
-Currently, the real thermal camera, Raspberry Pi 5, CNN pipeline and robot/autonomous hardware have NOT been deployed.
+Currently, the real thermal camera, Raspberry Pi 4 Model B, CNN pipeline and robot/autonomous hardware have NOT been deployed.
 
 The current laptop is only:
 - the development environment;
@@ -67,11 +67,20 @@ Do not treat the laptop itself as the autonomous vehicle.
 2. DEVELOPMENT ENVIRONMENT
 ==================================================
 
-Operating system:
-Ubuntu 22.04
+Development laptop operating system:
+Ubuntu 24.04.5 LTS
 
-ROS version:
-ROS 2 Humble
+Development laptop ROS version:
+ROS 2 Jazzy
+
+Payload Box target:
+
+- Edge computer: Raspberry Pi 4 Model B.
+- Operating system: Raspberry Pi OS.
+- ROS version: ROS 2 Jazzy.
+- The Raspberry Pi is the future real Payload Box runtime.
+- Do not assume that Ubuntu-specific ROS installation steps also apply unchanged
+  to Raspberry Pi OS; verify the Raspberry Pi OS installation method separately.
 
 Workspace:
 
@@ -79,7 +88,7 @@ Workspace:
 
 ROS 2 environment:
 
-source /opt/ros/humble/setup.bash
+source /opt/ros/jazzy/setup.bash
 
 After the workspace has been built:
 
@@ -102,13 +111,51 @@ Before running relative-path commands, always verify the current working directo
 For builds, normally use:
 
 cd ~/thermal_ws
-source /opt/ros/humble/setup.bash
+source /opt/ros/jazzy/setup.bash
 
 If install/setup.bash exists:
 
 source ~/thermal_ws/install/setup.bash
 
 Then run the required colcon command.
+
+--------------------------------------------------
+2.1 SELECTED THERMAL CAMERA
+--------------------------------------------------
+
+The thermal camera selected for this project is:
+
+Waveshare Thermal-90 USB Camera
+
+Project-relevant camera configuration:
+
+- Thermal image resolution: 80(H) × 62(V) pixels.
+- Field of view: 90° wide-angle version.
+- Host connector/interface: USB Type-C (USB-C).
+- The supplied connection cable is Type-C to Type-C.
+- On Raspberry Pi/Linux, use the USB-camera path and the vendor USB example
+  (`stream_usb.py`) as the relevant integration reference.
+
+IMPORTANT VARIANT BOUNDARY:
+
+- Use information for the Thermal-90 USB Camera only.
+- Do NOT use the 45° basic-version field of view.
+- Do NOT treat this device as the Thermal Camera HAT or Thermal-90 Camera HAT.
+- Do NOT design the camera integration around the Raspberry Pi 40-pin GPIO
+  header, SPI or I2C; those connections and setup steps belong to HAT variants.
+- When a Waveshare page describes several variants together, verify that each
+  specification or procedure applies to the Type-C, 90° USB variant before
+  adding it to this project.
+
+Official vendor references:
+
+- Wiki: https://www.waveshare.com/wiki/Thermal_Camera_HAT
+- Product page: https://www.waveshare.com/thermal-camera.htm
+
+Selection of this model does not mean that the physical camera has already
+been deployed. Until hardware integration is explicitly completed and tested,
+the camera remains the selected target hardware and `payload_sim` remains the
+verified integration source.
 
 ==================================================
 3. CURRENT PROJECT ARCHITECTURE
@@ -312,8 +359,7 @@ ros2 launch payload_bringup simulation.launch.py
 
 The following functionality has already been verified:
 
-ROS 2 Humble                         PASS
-ROS 2 workspace                     PASS
+ROS 2 workspace                     PASS (previous verified baseline)
 colcon build                        PASS
 
 payload_interfaces                  PASS
@@ -575,7 +621,11 @@ Do not manually modify generated build/install files as a normal development app
 10. GIT / MULTI-MACHINE DIRECTION
 ==================================================
 
-Development is currently being performed on an Ubuntu 22.04 + ROS 2 Humble machine.
+Development is performed on a laptop running Ubuntu 24.04.5 LTS + ROS 2 Jazzy.
+
+The target Payload Box is a Raspberry Pi 4 Model B running Raspberry Pi OS +
+ROS 2 Jazzy. Keep laptop development and Raspberry Pi deployment instructions
+separate where their operating systems require different setup steps.
 
 The source code may later be synchronized to another development machine using Git.
 
@@ -659,9 +709,9 @@ Current development intentionally performs ROS 2 integration early using simulat
 
 Current practical direction:
 
-Laptop Ubuntu
+Laptop Ubuntu 24.04.5 LTS
       ↓
-ROS 2 Humble
+ROS 2 Jazzy
       ↓
 ROS 2 Nodes / Topics / Pub-Sub
       ↓
@@ -762,11 +812,18 @@ Do NOT store transient information such as:
 14. CURRENT PROJECT STATE
 ==================================================
 
-Verified environment:
+Current development environment:
 
-- Ubuntu 22.04
-- ROS 2 Humble
-- Workspace: ~/thermal_ws
+- Laptop operating system: Ubuntu 24.04.5 LTS.
+- ROS distribution: ROS 2 Jazzy.
+- Workspace: ~/thermal_ws.
+
+Target Payload Box environment:
+
+- Edge computer: Raspberry Pi 4 Model B.
+- Operating system: Raspberry Pi OS.
+- ROS distribution: ROS 2 Jazzy.
+- Deployment and runtime verification on the Raspberry Pi are still pending.
 
 Verified packages:
 
@@ -819,8 +876,8 @@ Current logical architecture:
 
 Real hardware status:
 
-- Raspberry Pi 5: not yet deployed.
-- Thermal camera: not yet finalized/deployed.
+- Raspberry Pi 4 Model B: selected, not yet deployed or runtime-verified.
+- Thermal camera: Waveshare Thermal-90 USB Camera selected, not yet deployed.
 - CNN detector: not yet integrated into Payload runtime.
 - Physical autonomous platform: not yet integrated.
 
@@ -830,16 +887,16 @@ Real hardware status:
 
 Status: COMPLETED
 
-Add the ROS 2 command interface from the autonomous side to fake_payload:
+Update the documented hardware and software environment decisions:
 
-- Topic: /payload/command
-- Type: std_msgs/msg/String
-- Supported commands: START, STOP, RESET
-- fake_payload receives and logs commands without changing detection behavior.
-- Preserve and runtime-test /payload/detections and /payload/status.
+- Payload edge computer: Raspberry Pi 4 Model B.
+- Payload operating system: Raspberry Pi OS.
+- Development laptop: Ubuntu 24.04.5 LTS.
+- ROS distribution for laptop and Payload: ROS 2 Jazzy.
+- Preserve the distinction between the development laptop and the real Payload Box.
 
-Verified complete: START, STOP and RESET were received correctly while
-detection reception and RUNNING status publishing remained operational.
+Documentation updated. Runtime verification on the new Jazzy environments is
+still pending and must not be reported as complete until actually tested.
 
 ==================================================
 16. COMPLETION REPORT STYLE

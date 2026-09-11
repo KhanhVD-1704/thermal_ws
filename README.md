@@ -1,7 +1,9 @@
 # Thermal Payload ROS 2 Workspace
 
-ROS 2 Humble workspace for developing and testing an edge thermal-vision payload
-for search-and-rescue autonomous platforms.
+ROS 2 Jazzy workspace for developing and testing an edge thermal-vision payload
+for search-and-rescue autonomous platforms. Development is performed on an
+Ubuntu 24.04.5 LTS laptop; the target Payload Box is a Raspberry Pi 4 Model B
+running Raspberry Pi OS.
 
 ## Packages
 
@@ -14,7 +16,7 @@ for search-and-rescue autonomous platforms.
 
 ```bash
 cd ~/thermal_ws
-source /opt/ros/humble/setup.bash
+source /opt/ros/jazzy/setup.bash
 colcon build
 source install/setup.bash
 ```
